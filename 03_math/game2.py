@@ -2,6 +2,7 @@ from random import randint
 from enum import Enum
 from time import sleep
 from sys import exit
+from os import system
 
 class Player:
     def __init__(self, name):
@@ -12,7 +13,7 @@ class Player:
         pass
 
     def attack(self, enemy):
-        print("{}이 {}을 공격!".format(self.name, enemy.name))
+        print("{}, {} 공격!".format(self.name, enemy.name))
         chance = randint(1, 10)
         if chance <= self.CRI:
             print("특수 공격 발동!")
@@ -39,9 +40,9 @@ class Warrior(Player):
     def __init__(self, name):
         self.name = name
         self.HP = 10
-        self.ATK = 4
+        self.ATK = 3
         self.DEF = 2
-        self.DEX = 4
+        self.DEX = 5
         self.CRI = 3
 
     def __str__(self):
@@ -50,7 +51,7 @@ class Warrior(Player):
     def special_attack(self, enemy):
         enemy.DEF -= 1
         print("""
-            물렁해지기! : {}의 방어력이 1만큼 감소합니다.
+            물렁해져라! : {}의 방어력이 1만큼 감소합니다.
             현재 방어력: {}
             """.format(enemy.name, enemy.DEF)
         )
@@ -60,9 +61,49 @@ class Warrior(Player):
     def special_defense(self, enemy):
         self.DEF += 1
         print("""
-            단단해지기! : {}의 방어력이 1만큼 상승합니다.
+            단단해져라! : {}의 방어력이 1만큼 상승합니다.
             현재 방어력: {}
             """.format(self.name, self.DEF)
+        )
+
+class Thief(Player):
+    def __init__(self, name):
+        self.name = name
+        self.HP = 5
+        self.ATK = 3
+        self.DEF = 1
+        self.DEX = 8
+        self.CRI = 3
+
+    def __str__(self):
+        return "NAME: {}, JOB: Thief\nHP: {}".format(self.name, self.HP)
+
+    def special_attack(self, enemy):
+        if enemy.ATK > 1:
+            enemy.ATK -= 1
+            self.ATK += 1
+            print("""
+                무기 압수! : {}의 공격력을 1만큼 갈취합니다.
+                {}의 현재 공격력: {}
+                {}의 현재 공격력: {}
+                """.format(enemy.name, enemy.name, enemy.ATK, self.name, self.ATK)
+            )
+        else:
+            enemy.HP -= 1
+            self.HP += 1
+            print("""
+                신체포기각서 : {}의 공격력이 부족하므로 체력을 1만큼 갈취합니다.
+                {}의 현재 체력: {}
+                {}의 현재 체력: {}
+                """.format(enemy.name, enemy.name, enemy.HP, self.name, self.HP)
+            )
+        damage = self.ATK - enemy.DEF
+        enemy.HP -= damage
+
+    def special_defense(self, enemy):
+        print("""
+            민첩한 회피! : {}가 회피합니다.
+            """.format(self.name)
         )
 ################################################################
 def turn(p1, p2):
@@ -82,6 +123,7 @@ def turn(p1, p2):
         exit(1)
     ####################################################
     sleep(2)
+    system("clear")
     print("====================================================")
     print("{}의 차례".format(p2.name))
     sleep(2)
@@ -98,8 +140,9 @@ def turn(p1, p2):
         exit(1)
     print("====================================================")
     sleep(2)
+    system("clear")
 
-p1 = Warrior("윤수")
+p1 = Thief("윤수")
 p2 = Warrior("동규")
 
 coin = randint(1, 2)
