@@ -41,7 +41,7 @@ class Warrior(Player):
         self.HP = 10
         self.ATK = 4
         self.DEF = 2
-        self.DEX = 3
+        self.DEX = 4
         self.CRI = 3
 
     def __str__(self):
@@ -68,7 +68,7 @@ class Warrior(Player):
 def turn(p1, p2):
     print("====================================================")
     print("{}의 차례".format(p1.name))
-    sleep(1)
+    sleep(2)
     p1.attack(p2)
     print("현재 상태")
     print()
@@ -84,7 +84,7 @@ def turn(p1, p2):
     sleep(2)
     print("====================================================")
     print("{}의 차례".format(p2.name))
-    sleep(1)
+    sleep(2)
     p2.attack(p1)
     print("현재 상태")
     print()
