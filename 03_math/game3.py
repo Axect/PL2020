@@ -66,6 +66,45 @@ class Warrior(Player):
             """.format(self.name, self.DEF)
         )
 
+class Thief(Player):
+    def __init__(self, name):
+        self.name = name
+        self.HP = 5
+        self.ATK = 3
+        self.DEF = 1
+        self.DEX = 8
+        self.CRI = 3
+
+    def __str__(self):
+        return "NAME: {}, JOB: Thief\nHP: {}".format(self.name, self.HP)
+
+    def special_attack(self, enemy):
+        if enemy.ATK > 1:
+            enemy.ATK -= 1
+            self.ATK += 1
+            print("""
+                무기 압수! : {}의 공격력을 1만큼 갈취합니다.
+                {}의 현재 공격력: {}
+                {}의 현재 공격력: {}
+                """.format(enemy.name, enemy.name, enemy.ATK, self.name, self.ATK)
+            )
+        else:
+            enemy.HP -= 1
+            self.HP += 1
+            print("""
+                신체포기각서 : {}의 공격력이 부족하므로 체력을 1만큼 갈취합니다.
+                {}의 현재 체력: {}
+                {}의 현재 체력: {}
+                """.format(enemy.name, enemy.name, enemy.HP, self.name, self.HP)
+            )
+        damage = self.ATK - enemy.DEF
+        enemy.HP -= damage
+
+    def special_defense(self, enemy):
+        print("""
+            민첩한 회피! : {}가 회피합니다.
+            """.format(self.name)
+        )
 ################################################################
 def turn(p1, p2):
     print("====================================================")
