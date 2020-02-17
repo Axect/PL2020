@@ -90,12 +90,12 @@ class Thief(Player):
             )
         else:
             enemy.HP -= 1
-            self.HP += 1
+            self.ATK += 1
             print("""
-                신체포기각서 : {}의 공격력이 부족하므로 체력을 1만큼 갈취합니다.
+                신체포기각서 : {}의 공격력이 부족하므로 체력으로 대체합니다.
                 {}의 현재 체력: {}
-                {}의 현재 체력: {}
-                """.format(enemy.name, enemy.name, enemy.HP, self.name, self.HP)
+                {}의 현재 공격력: {}
+                """.format(enemy.name, enemy.name, enemy.HP, self.name, self.ATK)
             )
         damage = self.ATK - enemy.DEF
         enemy.HP -= damage
@@ -151,6 +151,7 @@ if coin == 1:
 else:
     (p1, p2) = (p2, p1)
 
+system("clear")
 print("게임을 시작합니다.")
 
 for i in range(100):

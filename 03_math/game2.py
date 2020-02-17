@@ -112,6 +112,7 @@ if coin == 1:
 else:
     (p1, p2) = (p2, p1)
 
+system("clear")
 print("게임을 시작합니다.")
 
 for i in range(100):
