@@ -38,17 +38,17 @@ class Player:
             print("특수 공격 발동!")
             self.special_attack(enemy)
         else:
-            chance2 = randint(1, 10)
-            if chance2 <= enemy.DEX:
-                sleep(1)
-                print("특수 방어 발동!")
-                enemy.special_defense(self)
-            else:
-                enemy.defense(self)
+            enemy.defense(self)
     
     def defense(self, enemy):
-        damage = damage_calc(enemy.ATK, self.DEF)
-        self.HP -= damage
+        damage = damage_calc(enemy.TMP, self.DEF)
+        chance2 = randint(1, 10)
+        if chance2 <= self.DEX:
+            sleep(1)
+            print("특수 방어 발동!")
+            self.special_defense(enemy)
+        else:
+            self.HP -= damage
 
     def special_attack(self, enemy):
         pass
@@ -94,6 +94,7 @@ class Warrior(Player):
         self.DEF = 2
         self.DEX = 4
         self.CRI = 3
+        self.TMP = self.ATK
 
     def __str__(self):
         return "NAME: {}, JOB: Warrior\nHP: {}".format(self.name, self.HP)
@@ -115,7 +116,7 @@ class Warrior(Player):
             """.format(self.name, self.DEF)
         )
 # ==============================================================================
-# Theif
+# Thief
 # ==============================================================================
 class Thief(Player):
     def __init__(self, name):
@@ -123,8 +124,9 @@ class Thief(Player):
         self.HP = 5
         self.ATK = 3
         self.DEF = 1
-        self.DEX = 8
+        self.DEX = 7
         self.CRI = 3
+        self.TMP = self.ATK
 
     def __str__(self):
         return "NAME: {}, JOB: Thief\nHP: {}".format(self.name, self.HP)
@@ -133,6 +135,7 @@ class Thief(Player):
         if enemy.ATK > 1:
             enemy.ATK -= 1
             self.ATK += 1
+            self.TMP = self.ATK
             print("""
                 무기 압수! : {}의 공격력을 1만큼 갈취합니다.
                 {}의 현재 공격력: {}
@@ -142,6 +145,7 @@ class Thief(Player):
         else:
             enemy.HP -= 1
             self.ATK += 1
+            self.TMP = self.ATK
             print("""
                 신체포기각서 : {}의 공격력이 부족하므로 체력으로 대체합니다.
                 {}의 현재 체력: {}
@@ -161,7 +165,6 @@ class Thief(Player):
 class Element(Enum):
     Fire = 1
     Ice = 2
-    Chaos = 3
 
 class Magician(Player):
     def __init__(self, name, element):
@@ -177,12 +180,15 @@ class Magician(Player):
         self.SK3 = 1 # Ultimate Skill
         self.ATK = 0
         self.DMG = 2
+        self.TMP = self.DMG
+        if self.elem == Element.Ice:
+            self.COLD = 0
 
     def __str__(self):
         return "NAME: {}, JOB: Magician({})\nHP: {}, MP: {}".format(self.name, str(self.elem.name), self.HP, self.MP)
 
     def recovery(self):
-        self.MP += 1
+        self.MP += 2
         print("마력을 회복합니다.\n현재 마력: {}".format(self.MP))
 
     def attack(self, enemy):
@@ -195,22 +201,30 @@ class Magician(Player):
         else:
             self.recovery()
 
-    def defense(self, enemy):
-        damage = damage_calc(enemy.ATK, self.DEF)
-        if damage >= self.HP + self.MP:
-            print("{}의 HP, MP가 부족합니다.".format(self.name))
-            self.HP -= damage - self.MP
-            self.MP = 0
-        elif damage >= self.HP:
-            print("{}의 HP가 부족하므로 MP로 일정부분 대체합니다.".format(self.name))
-            damage -= (self.HP - 1)
-            self.HP = 1
+    def defense_normal(self, enemy):
+        damage = damage_calc(enemy.TMP, self.DEF)
+        if damage <= self.MP:
+            print("데미지를 MP로 상쇄합니다.")
             self.MP -= damage
         else:
+            print("데미지를 MP로 상쇄합니다.")
+            (damage, self.MP) = (damage - self.MP, 0)
             self.HP -= damage
+
+    def defense(self, enemy):
+        chance2 = randint(1, 10)
+        if chance2 <= self.DEX:
+            sleep(1)
+            print("특수방어 발동!")
+            self.special_defense(enemy)
+        else:
+            self.defense_normal(enemy)
 
     def special_attack(self, enemy):
         skill = randint(1, 10)
+        # ==============================================================================
+        # Fire Magician
+        # ==============================================================================
         if self.elem == Element.Fire:
             if skill <= self.SK1:
                 if self.MP < 1:
@@ -221,13 +235,14 @@ class Magician(Player):
                     self.recovery()
                 else:
                     damage = self.DMG
-                    enemy.HP -= damage_calc(damage, enemy.DEF)
                     enemy.HP -= 1
                     self.MP -= 1
                     print("""
                     폭죽 쏘기! : 마나 1을 소모하여 고정데미지 {}와 화상데미지 1을 입힙니다.
                     현재 마력: {}
                     """.format(damage, self.MP))
+                    self.TMP = damage
+                    enemy.defense(self)
             elif skill <= self.SK1 + self.SK2:
                 if self.MP < 2:
                     print("폭죽 개량을 위한 마력이 부족합니다!")
@@ -254,16 +269,78 @@ class Magician(Player):
                     self.attack(enemy)
                     sleep(1)
                     self.attack(enemy)
+        # ==============================================================================
+        # Ice Magician
+        # ==============================================================================
+        elif self.elem == Element.Ice:
+            if self.COLD >= 10:
+                print("""
+                추위가 극에 달했습니다.
+                {}의 머리가 띵해지면서 2턴 동안 움직이지 못합니다.
+                2턴 동안 들어가는 모든 공격은 특수 공격이 됩니다.
+                """.format(enemy.name))
+                self.COLD -= 5
+                sleep(1)
+                self.special_attack(enemy)
+                sleep(1)
+                self.special_attack(enemy)
+            elif skill <= self.SK1:
+                if self.MP < 1:
+                    print("""
+                    고드름을 준비하기 위한 마력이 부족합니다!
+                    마나를 회복합니다.
+                    """)
+                    self.recovery()
+                else:
+                    damage = self.DMG if self.COLD <4 else self.DMG * 2
+                    self.MP -= 1
+                    self.COLD += 2
+                    print("""
+                    고드름 쏘기! : 마나 1을 소모하여 고정데미지 {}을 입힙니다.
+                    날씨가 조금 추워집니다.
+                    현재 마력: {}
+                    현재 추위: {}
+                    """.format(damage, self.MP, self.COLD))
+                    self.TMP = damage
+                    enemy.defense(self)
+            elif skill <= self.SK1 + self.SK2:
+                if self.MP < 2:
+                    print("부장님이 개그를 치기 위한 마력이 부족합니다!")
+                    self.recovery()
+                else:
+                    self.COLD *= 2
+                    self.MP -= 1
+                    print("""
+                    부장님 개그! : 마나 1을 소모하여 부장님이 엄청난 개그를 구사합니다.
+                    모두들 웃고 있지만 추위는 2배가 됩니다.
+                    현재 추위: {}
+                    """.format(self.COLD))
+            else:
+                if self.MP < 5:
+                    print("얼음땡을 위한 마력이 부족합니다!")
+                    self.recovery()
+                else:
+                    self.MP -= 5
+                    damage = self.COLD * 2
+                    print("""
+                    얼음땡! : 현재 추위의 2배 만큼의 데미지를 가합니다.
+                    데미지: {}
+                    """.format(damage))
+                    self.TMP = damage
+                    enemy.defense(self)
 
     def special_defense(self, enemy):
-        self.MP += enemy.ATK
+        self.MP += damage_calc(enemy.TMP, self.DEF)
         print("""
         흡수 실드! : 데미지를 마나로 전환합니다.
         현재 마나: {}
         """.format(self.MP))
+# ==============================================================================
+# 
+# ==============================================================================
 
-p1 = Warrior("윤수")
-p2 = Magician("동규", Element.Fire)
+p1 = Warrior("사전")
+p2 = Magician("얼법", Element.Ice)
 
 coin = randint(1, 2)
 if coin == 1:
