@@ -1,3 +1,4 @@
+import random
 from random import randint
 from enum import Enum
 from time import sleep
@@ -9,6 +10,10 @@ def damage_calc(damage, DEF):
         return 0
     else:
         return damage - DEF
+
+random.seed(None)
+
+
 
 # ==============================================================================
 # Player
@@ -44,7 +49,6 @@ class Player:
     def defense(self, enemy):
         damage = damage_calc(enemy.ATK, self.DEF)
         self.HP -= damage
-
 
     def special_attack(self, enemy):
         pass
@@ -164,9 +168,9 @@ class Magician(Player):
         self.name = name
         self.elem = element
         self.HP = 5
-        self.MP = 5
+        self.MP = 10
         self.DEF = 0
-        self.CRI = 5
+        self.CRI = 9
         self.DEX = 5
         self.SK1 = 6 # Default Skill
         self.SK2 = 3 # Second Skill
@@ -181,24 +185,39 @@ class Magician(Player):
         self.MP += 1
         print("마력을 회복합니다.\n현재 마력: {}".format(self.MP))
 
+    def attack(self, enemy):
+        print("{}, {} 공격!".format(self.name, enemy.name))
+        chance = randint(1, 10)
+        if chance <= self.CRI:
+            sleep(1)
+            print("특수 공격 발동!")
+            self.special_attack(enemy)
+        else:
+            self.recovery()
+
     def defense(self, enemy):
         damage = damage_calc(enemy.ATK, self.DEF)
         if damage >= self.HP + self.MP:
             print("{}의 HP, MP가 부족합니다.".format(self.name))
-            self.HP = 0
+            self.HP -= damage - self.MP
             self.MP = 0
         elif damage >= self.HP:
             print("{}의 HP가 부족하므로 MP로 일정부분 대체합니다.".format(self.name))
             damage -= (self.HP - 1)
             self.HP = 1
             self.MP -= damage
+        else:
+            self.HP -= damage
 
     def special_attack(self, enemy):
         skill = randint(1, 10)
         if self.elem == Element.Fire:
             if skill <= self.SK1:
                 if self.MP < 1:
-                    print("폭죽을 준비하기 위한 마력이 부족합니다!")
+                    print("""
+                    폭죽을 준비하기 위한 마력이 부족합니다!
+                    마나를 회복합니다.
+                    """)
                     self.recovery()
                 else:
                     damage = self.DMG
@@ -225,12 +244,16 @@ class Magician(Player):
                     print("여의도 불꽃축제를 위한 마력이 부족합니다!")
                     self.recovery()
                 else:
+                    self.MP -= 5
                     print("""
                     여의도 불꽃 축제 개최! : 상대방이 불꽃축제에 홀려 3턴동안 쉬게 됩니다.
                     """)
-                    self.turn(enemy)
-                    self.turn(enemy)
-                    self.turn(enemy)
+                    sleep(1)
+                    self.attack(enemy)
+                    sleep(1)
+                    self.attack(enemy)
+                    sleep(1)
+                    self.attack(enemy)
 
     def special_defense(self, enemy):
         self.MP += enemy.ATK
@@ -239,9 +262,7 @@ class Magician(Player):
         현재 마나: {}
         """.format(self.MP))
 
-
-
-p1 = Thief("윤수")
+p1 = Warrior("윤수")
 p2 = Magician("동규", Element.Fire)
 
 coin = randint(1, 2)
