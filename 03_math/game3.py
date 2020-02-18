@@ -292,16 +292,16 @@ class Magician(Player):
                     """)
                     self.recovery()
                 else:
-                    damage = self.DMG if self.COLD <4 else self.DMG * 2
+                    damage = 1 if self.COLD <4 else 2
                     self.MP -= 1
                     self.COLD += 2
                     print("""
-                    고드름 쏘기! : 마나 1을 소모하여 고정데미지 {}을 입힙니다.
+                    고드름 쏘기! : 마나 1을 소모하여 방어무시데미지 {}을 입힙니다.
                     날씨가 조금 추워집니다.
                     현재 마력: {}
                     현재 추위: {}
                     """.format(damage, self.MP, self.COLD))
-                    self.TMP = damage
+                    self.TMP = damage + enemy.DEF
                     enemy.defense(self)
             elif skill <= self.SK1 + self.SK2:
                 if self.MP < 2:
