@@ -174,7 +174,7 @@ class Magician(Player):
         self.MP = 10
         self.DEF = 0
         self.CRI = 9
-        self.DEX = 5
+        self.DEX = 4
         self.SK1 = 6 # Default Skill
         self.SK2 = 3 # Second Skill
         self.SK3 = 1 # Ultimate Skill
@@ -278,7 +278,9 @@ class Magician(Player):
                 추위가 극에 달했습니다.
                 {}의 머리가 띵해지면서 2턴 동안 움직이지 못합니다.
                 2턴 동안 들어가는 모든 공격은 특수 공격이 됩니다.
+                적의 민첩이 1 하락합니다.
                 """.format(enemy.name))
+                enemy.DEX -= 1
                 self.COLD -= 5
                 sleep(1)
                 self.special_attack(enemy)
@@ -339,7 +341,7 @@ class Magician(Player):
 # 
 # ==============================================================================
 
-p1 = Warrior("사전")
+p1 = Magician("불법", Element.Fire)
 p2 = Magician("얼법", Element.Ice)
 
 coin = randint(1, 2)
