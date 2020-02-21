@@ -22,6 +22,15 @@ pub struct Target {
     prop: TargetProp,
 }
 
+impl Target {
+    pub fn new(p: TargetPlayer, prop: TargetProp) -> Self {
+        Target {
+            player: p,
+            prop
+        }
+    }
+}
+
 #[derive(Debug, Copy, Clone)]
 pub enum Operation {
     Plus(usize),
@@ -31,8 +40,4 @@ pub enum Operation {
     Swap(Target),
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct Command {
-    target: Target,
-    ops: Operation
-}
+pub type Command = Vec<(Target, Operation)>;
