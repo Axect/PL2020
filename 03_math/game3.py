@@ -81,7 +81,7 @@ class Player:
             print("{}의 승리!".format(enemy.name))
             exit(1)
         print("="*40)
-        sleep(1.5)
+        input()
 # ==============================================================================
 # Warrior
 # ==============================================================================
@@ -294,7 +294,7 @@ class Magician(Player):
                     """)
                     self.recovery()
                 else:
-                    damage = 1 if self.COLD <4 else 2
+                    damage = 1 if self.COLD < 4 else 2
                     self.MP -= 1
                     self.COLD += 2
                     print("""
@@ -341,10 +341,6 @@ class Magician(Player):
 # ==============================================================================
 # Hero
 # ==============================================================================
-class Difficulty(Enum):
-    Easy = 1
-    Hard = 2
-
 class Hero(Player):
     def __init__(self, name):
         self.name = name
@@ -427,8 +423,8 @@ class Hero(Player):
 # ==============================================================================
 # Play!
 # ==============================================================================
-p1 = Hero("주인")
-p2 = Magician("불법", Element.Fire)
+p1 = Hero("동규")
+p2 = Thief("찬우")
 
 coin = randint(1, 2)
 if coin == 1:
