@@ -341,6 +341,10 @@ class Magician(Player):
 # ==============================================================================
 # Hero
 # ==============================================================================
+class Item(Enum):
+    DualBlade = 1
+    Elixir = 2
+
 class Hero(Player):
     def __init__(self, name):
         self.name = name
@@ -348,7 +352,7 @@ class Hero(Player):
         self.ATK = 1
         self.DEF = 1
         self.DEX = 9
-        self.CRI = 3
+        self.CRI = 2
         self.TMP = self.ATK
         # unique
         self.EXP = 0
@@ -356,17 +360,62 @@ class Hero(Player):
         self.HPMAX = 6
         self.ATKMAX = 1
         self.DEFMAX = 1
-        self.CRIMAX = 3
+        self.CRIMAX = 2
         self.DEXMAX = 3
         self.REQEXP = 3
+        self.ITEM = None
 
     def __str__(self):
         return "NAME: {}, JOB: Hero\nHP: {}, LEVEL: {}, EXP: {}".format(self.name, self.HP, self.LEVEL, self.EXP)
 
     def level_up(self):
-        self.HPMAX += 1
-        self.ATKMAX += 1
-        self.DEFMAX += 1
+        print("""
+            레벨업을 위한 경험치가 모두 준비되었습니다.
+            상태이상과 체력이 모두 회복되며 랜덤으로 능력이 향상됩니다.
+            LEVEL = {}""".format(self.LEVEL+1))
+        stat = randint(1, 7)
+        if stat == 1:
+            self.HPMAX += 2
+            print("""
+            체력이 향상됩니다.
+            현재 체력 : {}
+            """.format(self.HPMAX))
+        elif stat == 2:
+            self.ATKMAX += 2
+            print("""
+            공격이 향상됩니다.
+            현재 공격력 : {}
+            """.format(self.ATKMAX))
+        elif stat == 3:
+            self.DEFMAX += 2
+            print("""
+            방어력이 향상됩니다.
+            현재 방어력 :{}
+            """.format(self.DEFMAX))
+        elif stat == 4:
+            self.CRIMAX += 1
+            print("""
+            특수공격 발동률이 향상됩니다.
+            특수공격 발동률 : {}
+            """.format(self.CRIMAX))
+        elif stat == 5:
+            self.DEXMAX += 1
+            print("""
+            회피율이 향상됩니다.
+            현재 회피율 : {}
+            """.format(self.DEXMAX))
+        elif stat == 6:
+            self.ITEM = Item.DualBlade
+            print("""
+            듀얼 블레이드를 획득하였습니다.
+            이제 기본공격은 항상 두 번 발동합니다.
+            """)
+        else:
+            self.ITEM = Item.Elixir
+            print("""
+            엘릭서를 획득하였습니다.
+            이제 특수방어를 할 때 마다 체력이 모두 회복됩니다.
+            """)
         self.HP = self.HPMAX
         self.ATK = self.ATKMAX
         self.DEF = self.DEFMAX
@@ -374,23 +423,8 @@ class Hero(Player):
         self.DEX = self.DEXMAX
         self.EXP -= self.REQEXP
         self.TMP = self.ATK
-        self.REQEXP = (self.LEVEL + 1) * 3
-        print("""
-            레벨업을 위한 경험치가 모두 준비되었습니다.
-            상태이상과 체력이 모두 회복되며 신체능력이 모두 향상됩니다.
-            다음 레벨을 위해서 필요한 경험치는 {}입니다.
-            LEVEL: {}
-            HP: {}
-            ATK: {}
-            DEF: {}
-        """.format(self.REQEXP, self.LEVEL+1, self.HP, self.ATK, self.DEF))
+        self.REQEXP += self.LEVEL
         sleep(1)
-        if self.LEVEL == 1:
-            print("""
-            레벨이 2가 되었으므로 초보자 보호 효과가 사라집니다.
-            DEX: 9 -> 3
-            """)
-            self.DEX = 3
         self.LEVEL += 1
 
     def attack(self, enemy):
@@ -399,6 +433,11 @@ class Hero(Player):
             self.level_up()
         self.TMP = self.ATK
         super().attack(enemy)
+        if self.ITEM == Item.DualBlade:
+            print("""
+            듀얼 블레이드의 효과로 공격이 한번 더 발동됩니다.
+            """)
+            super().attack(enemy)
 
     def defense(self, enemy):
         self.EXP += 1
@@ -416,15 +455,18 @@ class Hero(Player):
     def special_defense(self, enemy):
         print("""
             주인공 보정으로 인해 주인공은 절대 맞지 않습니다.
-            """
-        )
-
+            """)
+        if self.ITEM == Item.Elixir:
+            print("""
+            엘릭서의 효과로 체력이 모두 회복됩니다.
+            """)
+            self.HP = self.HPMAX
 
 # ==============================================================================
 # Play!
 # ==============================================================================
-p1 = Hero("동규")
-p2 = Thief("찬우")
+p1 = Hero("A")
+p2 = Magician("B", Element.Fire)
 
 coin = randint(1, 2)
 if coin == 1:
