@@ -32,16 +32,22 @@ class Rational:
         return r
 
     def __sub__(self, other):
-        pass
+        temp = Rational(-other.num, other.denom)
+        return self + temp
     
     def __mul__(self, other):
-        pass
+        r = Rational(1, 1)
+        r.num = self.num * other.num
+        r.denom = self.denom * other.denom
+        r.simplify()
+        return r
 
-    def __div__(self, other):
-        pass
+    def __truediv__(self, other):
+        temp = Rational(other.denom, other.num)
+        return self * temp
 
     def __pow__(self, n):
-        pass
+        return Rational(self.num ** n, self.denom ** n)
 
     def simplify(self):
         num = abs(self.num)
@@ -60,9 +66,14 @@ def gcd(a, b):
     else:
         return gcd(b, a % b)
 
-r1 = Rational(1, 27)
-r2 = Rational(2, 27)
-print(r1)
-print(r2)
+r1 = Rational(1, 3)
+r2 = Rational(2, 5)
+print("r1", r1)
+print("r2", r2)
+print()
 
-print(r1 + r2)
+print("r1+r2=", r1 + r2)
+print("r1-r2=", r1 - r2)
+print("r1*r2=", r1 * r2)
+print("r1/r2=", r1 / r2)
+print("r1**2=", r1 ** 2)
