@@ -59,7 +59,7 @@ def calc(n, result):
         print("3등 당첨금은 {}입니다.".format(thr_total / thr))
 
 def main():
-    n = 1000000
+    n = 10000000
     answer = gen_lotto_bonus()
     data = lotto_sample(n)
     result = count(data, answer)
