@@ -1,30 +1,42 @@
 package main
 
-import (
-    "fmt"
-)
+import "fmt"
 
 func main() {
-    a1, _ := seq(6)
-    fmt.Println(a1)
-    _, s := seq(100)
-    fmt.Println(s)
+	// 1.
+	fmt.Println(A(6))
+
+	// 2.
+	n := 1
+	for {
+		if A(n) == 1 {
+			break
+		}
+		n += 1
+	}
+	fmt.Println(n)
+
+	// 3.
+	m := 1
+	s := 0
+	for {
+		b := A(m)
+		if b == 1 {
+			s += b
+			break
+		}
+		s += b
+		m += 1
+	}
+	fmt.Println(s)
 }
 
-func seq(n int) (int, int) {
-    a := 91
-    s := 0
-    for i:=1; i<n; i++ {
-        if i%2 == 0 {
-            a = a / 2
-        } else {
-            a += 1
-        }
-        s += a
-        if a == 1 {
-            fmt.Println(i)
-            return a, s
-        }
-    }
-    return a, s
+func A(n int) int {
+	if n == 1 {
+		return 91
+	} else if n%2 == 0 {
+		return A(n-1) + 1
+	} else {
+		return A(n-1) / 2
+	}
 }
