@@ -7,4 +7,5 @@ def a(p):
 ball = Phys1D(0, 20, a, 1e-3)
 while ball.t < 3:
     ball.update()
+    print("{:.6f}\t{:.6f}\t{:.6f}".format(ball.x, ball.v, ball.t))
 print(ball.x)
